@@ -1,0 +1,7 @@
+# Ignore the CV-4 folder
+CV-5/
+uploads/
+.env
+__pycache__/
+*.pyc
+build/

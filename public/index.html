@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Rewriter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>CV Rewriter</h1>
+        <form id="cv-form">
+            <label for="cv">Upload CV (PDF or Word):</label>
+            <input type="file" id="cv" name="cv" accept=".pdf,.doc,.docx">
+           
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes" rows="10"></textarea>
+           
+            <button type="button" onclick="uploadCV()">Upload and Process</button>
+        </form>
+
+        <h2>New CV:</h2>
+        <pre id="new-cv"></pre>
+    </div>
+
+    <script>
+        async function uploadCV() {
+            const form = document.getElementById('cv-form');
+            const formData = new FormData(form);
+
+            // Upload CV
+            let response = await fetch('/upload_cv', {
+                method: 'POST',
+                body: formData
+            });
+            let data = await response.json();
+            const filename = data.filename;
+
+            // Upload notes
+            response = await fetch('/upload_notes', {
+                method: 'POST',
+                body: new URLSearchParams(new FormData(form))
+            });
+            data = await response.json();
+            const notes = data.notes;
+
+            // Process CV
+            response = await fetch('/process_cv', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ filename, notes })
+            });
+            data = await response.json();
+            document.getElementById('new-cv').innerText = data.new_cv;
+        }
+    </script>
+</body>
+</html>
